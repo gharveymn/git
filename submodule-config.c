@@ -414,6 +414,7 @@ static struct submodule *lookup_or_create_by_name(struct submodule_cache *cache,
 	submodule->ignore = NULL;
 	submodule->branch = NULL;
 	submodule->recommend_shallow = -1;
+	submodule->ignore_submodules = -1;
 
 	oidcpy(&submodule->gitmodules_oid, gitmodules_oid);
 
@@ -665,6 +666,13 @@ static int parse_config(const char *var, const char *value,
 			free((void *)submodule->branch);
 			submodule->branch = xstrdup(value);
 		}
+	} else if (!strcmp(item.buf, "ignoresubmodules")) {
+		if (!me->overwrite && submodule->ignore_submodules != -1)
+			warn_multiple_config(me->treeish_name, submodule->name,
+					     "ignoresubmodules");
+		else
+			submodule->ignore_submodules =
+				git_config_bool(var, value);
 	}
 
 	strbuf_release(&name);

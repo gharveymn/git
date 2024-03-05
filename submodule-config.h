@@ -42,6 +42,7 @@ struct submodule {
 	/* the object id of the responsible .gitmodules file */
 	struct object_id gitmodules_oid;
 	int recommend_shallow;
+	int ignore_submodules;
 };
 struct submodule_cache;
 struct repository;

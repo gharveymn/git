@@ -458,6 +458,7 @@ static void init_submodule(const char *path, const char *prefix,
 	const struct submodule *sub;
 	struct strbuf sb = STRBUF_INIT;
 	const char *upd;
+	int ignore_submodules;
 	char *url = NULL, *displaypath;
 
 	displaypath = get_submodule_displaypath(path, prefix, super_prefix);
@@ -2516,6 +2517,7 @@ static void update_data_to_args(const struct update_data *update_data,
 static int update_submodule(struct update_data *update_data)
 {
 	int ret;
+	const struct submodule *sub;
 
 	ret = determine_submodule_update_strategy(the_repository,
 						  update_data->just_cloned,
@@ -2567,7 +2569,8 @@ static int update_submodule(struct update_data *update_data)
 			return ret;
 	}
 
-	if (update_data->recursive) {
+	sub = submodule_from_path(the_repository, null_oid(), update_data->sm_path);
+	if (update_data->recursive && sub->ignore_submodules == -1) {
 		struct child_process cp = CHILD_PROCESS_INIT;
 		struct update_data next = *update_data;
 
